@@ -103,6 +103,8 @@ class MRLR():
             # J has converged, and then break;
             # 待写
 
+        return u,v,c
+
 
 
 
