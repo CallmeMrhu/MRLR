@@ -59,7 +59,6 @@ class MRLR():
                     Dc.append(u_vi_vk)
         Dc = np.array(Dc)
         return Dc
-
     # build Dr：user-specific ranking triples
     # method：randomly sample
     # definition:for every Dc, there are 'Count' time Dr
@@ -86,7 +85,6 @@ class MRLR():
                     u_vi_copy.append(is_zero[0][sample_index])
                     u_vi_vj = np.array(u_vi_copy)
                     Dr.append(u_vi_vj)
-
         Dr = np.array(Dr)
         return Dr
 
