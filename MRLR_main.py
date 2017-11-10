@@ -2,6 +2,7 @@
 
 import MRLR_LoadData
 import MRLR_Optimization
+import MRLR_Optimization_own
 import numpy as np
 
 if __name__ == '__main__':
@@ -33,13 +34,10 @@ if __name__ == '__main__':
 
     # R,C,lamda,alpha1,alpha3,gamma,d,iter,N,Count):
 
-    # 实验一下已经写好的代码，生成Dc,Dr...待做
-    opt_MRLR = MRLR_Optimization.MRLR(R,C,0.001,0.001,0.001,0.001,8,100,4,2)
-    Dc = opt_MRLR.init_Dc()
+    # 测试
+    opt_MRLR = MRLR_Optimization_own.MRLR(R,C,0.001,0.001,0.001,0.001,8,10,4,2)
+    u,v,c = opt_MRLR.updata_parameter()
+    # print(u)
 
-    print(Dc)
-    # print(Dc.shape)
-    print(np.where(Dc[:][0]==1))
-    Dr = opt_MRLR.init_Dr()
     # print(Dr)
     # print(Dr.shape)
