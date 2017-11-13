@@ -28,21 +28,21 @@ class MRLR():
     # init user embedding
     def init_User_Embedding(self):
         user_number = len(self.R)
-        u = np.random.random((user_number, self.d))
+        u = -1 + 2 * np.random.random((user_number, self.d))
         # print(u)
         return u
 
     # init item embedding
     def init_Item_Embedding(self):
         item_number = len(self.R[0])
-        v = np.random.random((item_number, self.d))
+        v = -1 + 2 * np.random.random((item_number, self.d))
         # print(v)
         return v
 
     # init category embedding
     def init_Categories_Embedding(self):
         category_number = len(self.C[0])
-        c = np.random.random((category_number, self.d))
+        c = -1 + 2 * np.random.random((category_number, self.d))
         return c
 
     # add category embedding to item embedding
