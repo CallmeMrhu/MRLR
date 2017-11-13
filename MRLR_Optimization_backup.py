@@ -234,8 +234,8 @@ class MRLR():
                     negtive_sample = random.sample(range(is_zero_size_item_up), self.N)
                     pvk_negtive = 1
                     pvi_negtive = 1
-                    # for index_three in range(self.N):
-                    for index_three in range(4):
+                    for index_three in range(self.N):
+                    # for index_three in range(4):
                         id_three = negtive_sample[index_three]
                         g = is_zero_item_up[0][id_three]
                         a = (-1) * (self.alpha1 * np.dot(u[p], v[g]) + self.alpha2 * np.dot(v[k], v[g]))
@@ -271,8 +271,8 @@ class MRLR():
                     # print('pij_postive:%f' % pij_postive)
                     pij_negtive = 1
                     negtive_sample = random.sample(range(is_zero_size_item_up), self.N)
-                    # for index_three in range(self.N):
-                    for index_three in range(4):
+                    for index_three in range(self.N):
+                    # for index_three in range(4):
                         id_five = negtive_sample[index_three]
                         g = is_zero_item_up[0][id_five]
                         b = np.dot(u[p], v[j]) - np.dot(u[p], v[g])

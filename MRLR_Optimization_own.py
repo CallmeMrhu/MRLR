@@ -1,5 +1,6 @@
 # author : hucheng
 # 2017.11.9
+# don't update v[g] ,comparing with MRLR_Optimization_backup.py
 
 import numpy as np
 import random
