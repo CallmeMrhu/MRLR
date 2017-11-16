@@ -11,7 +11,7 @@ import random
 class MRLR():
 
     # init parameter set
-    def __init__(self,R,C,lamda,alpha1,alpha3,gamma,d,iter,N):
+    def __init__(self,R,C,lamda,alpha1,alpha3,gamma,d,iter,N,Count):
         self.R = R
         self.C = C
         self.lamda = lamda
@@ -21,6 +21,7 @@ class MRLR():
         self.d = d
         self.iter = iter
         self.N = N
+        self.Count = Count
 
     # init user embedding
     def init_User_Embedding(self):
