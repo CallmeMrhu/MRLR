@@ -2,8 +2,8 @@
 
 import MRLR_LoadData
 import MRLR_Optimization
+import MRLR_Optimization_run
 import MRLR_Optimization_backup
-import MRLR_Optimization_own
 import numpy as np
 
 if __name__ == '__main__':
@@ -63,7 +63,7 @@ if __name__ == '__main__':
 
     # 测试
     # R, C, lamda, alpha1, alpha3, gamma, d, iter, N
-    opt_MRLR = MRLR_Optimization_backup.MRLR(R,C,0.01,0.8,0.3,0.01,10,100,20)
+    opt_MRLR = MRLR_Optimization_run.MRLR(R, C, 0.01, 0.8, 0.3, 0.01, 10, 100, 20)
     u,v,c = opt_MRLR.updata_parameter()
     # print(u)
     # print(v)
