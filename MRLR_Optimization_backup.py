@@ -80,6 +80,8 @@ class MRLR():
             for p in range(len(R)):
                 # every user has many items
                 non_zero_item_up = np.array(np.where(R[p] == 1))
+                # test = np.where(R[p] == 0)
+                # is_zero_item_up = test[0].tolist()
                 is_zero_item_up = np.array(np.where(R[p] == 0))
                 non_zero_size_item_up = non_zero_item_up.size
                 is_zero_size_item_up = is_zero_item_up.size
@@ -90,7 +92,8 @@ class MRLR():
                     # every item belongs to many categories
                     non_zero_category_vi = np.array(np.where(C[i] == 1))
                     non_zero_size_category_vi = non_zero_category_vi.size
-                    for id_two in range(i + 1, non_zero_size_item_up):
+                    # mistake : i should be id_one
+                    for id_two in range(id_one + 1, non_zero_size_item_up):
                         k = non_zero_item_up[0][id_two]
                         non_zero_category_vk = np.array(np.where(C[k] == 1))
                         non_zero_size_category_vk = non_zero_category_vk.size
@@ -112,10 +115,10 @@ class MRLR():
                             g = is_zero_item_up[0][id_three]
                             gpi_up = gpi_up + v[g] * (1 - logistic.cdf(
                                 (-1) * (self.alpha1 * np.dot(u[p], v[g]) + self.alpha2 * np.dot(v[k], v[g]))))
-                            # 2017.11.12 16:00
-                            # update negtive item vg, this is neccessary
-                            v[g] = v[g] - self.gamma * (u[p] + v[k]) * (1 - logistic.cdf(
-                                (-1) * (self.alpha1 * np.dot(u[p], v[g]) + self.alpha2 * np.dot(v[k], v[g]))))
+                            # # 2017.11.12 16:00
+                            # # update negtive item vg, this is neccessary
+                            # v[g] = v[g] - self.gamma * (u[p] + v[k]) * (1 - logistic.cdf(
+                            #     (-1) * (self.alpha1 * np.dot(u[p], v[g]) + self.alpha2 * np.dot(v[k], v[g]))))
 
                             gpk_up = gpk_up + v[g] * (1 - logistic.cdf(
                                 (-1) * (self.alpha1 * np.dot(u[p], v[g]) + self.alpha2 * np.dot(v[i], v[g]))))
@@ -123,9 +126,11 @@ class MRLR():
                             # 2017.11.12 16:00
                             # update negtive item vg, this is neccessary
                             v[g] = v[g] - self.gamma * (u[p] + v[i]) * (1 - logistic.cdf(
-                                (-1) * (self.alpha1 * np.dot(u[p], v[g]) + self.alpha2 * np.dot(v[i], v[g]))))
+                                (-1) * (self.alpha1 * np.dot(u[p], v[g]) + self.alpha2 * np.dot(v[i], v[
+                                    g])))) - 2 * self.lamda * np.sqrt(np.dot(v[g], v[g]))
                         # update up
-                        u[p] = u[p] + self.gamma * (kpi_up + ipk_up - gpi_up - gpk_up) + 2 * self.lamda * np.sqrt(
+                        gradient_Dc_up = kpi_up + ipk_up - gpi_up - gpk_up
+                        u[p] = u[p] + self.gamma * gradient_Dc_up - 2 * self.lamda * np.sqrt(
                             np.dot(u[p], u[p]))
                         # update vi
                         kpi_vi = kpi_up
@@ -133,8 +138,18 @@ class MRLR():
                             1 - logistic.cdf(self.alpha1 * np.dot(u[p], v[k]) + self.alpha2 * np.dot(v[k], v[i])))
                         gpi_vi = 0
                         gpk_vi = gpk_up
-                        v[i] = v[i] + self.gamma * (kpi_vi + ipk_vi - gpi_vi - gpk_vi) + 2 * self.lamda * np.sqrt(
+                        gradient_Dc_vi = kpi_vi + ipk_vi - gpi_vi - gpk_vi
+                        v[i] = v[i] + self.gamma * gradient_Dc_vi - 2 * self.lamda * np.sqrt(
                             np.dot(v[i], v[i]))
+                        # update vk
+                        ipk_vk = ipk_up
+                        kpi_vk = (u[p] + v[i]) * (
+                            1 - logistic.cdf(self.alpha1 * np.dot(u[p], v[k]) + self.alpha2 * np.dot(v[i], v[k])))
+                        gpk_vk = 0
+                        gpi_vk = gpi_up
+                        gradient_Dc_vk = ipk_vk + kpi_vk - gpk_vk - gpi_vk
+                        v[k] = v[k] + self.gamma * gradient_Dc_vk - 2 * self.lamda * np.sqrt(
+                            np.dot(v[k], v[k]))
 
                         # update cl : category,including Cvi & Cvk
                         # as to Cvi
@@ -174,21 +189,31 @@ class MRLR():
                         for index_three in range(N):
                             id_five = negtive_sample[index_three]
                             g = is_zero_item_up[0][id_five]
-                            if j == g:
-                                # print('randomly sampling at the same position')
-                                continue
-                            gpj_up = gpj_up + (-1) * (v[g] + v[j]) * (1 - logistic.cdf(-1 * (np.dot(u[p], v[j]) + np.dot(u[p], v[g]))))
+                            # if j == g:
+                            #     # print('randomly sampling at the same position')
+                            #     continue
+                            gpj_up = gpj_up + (v[g] + v[j]) * (
+                                1 - logistic.cdf((-1) * (np.dot(u[p], v[j]) + np.dot(u[p], v[g]))))
                             # 2017.11.12 16:00
                             # update negtive item vg and vj, this is neccessary
-                            gpj_vj = gpj_vj + (-1) * u[p] * (1 - logistic.cdf(-1 * (np.dot(u[p], v[j]) + np.dot(u[p], v[g]))))
-                            v[g] = v[g] - u[p] * (1 - logistic.cdf(-1 * (np.dot(u[p], v[j]) + np.dot(u[p], v[g]))))
+                            gpj_vj = gpj_vj + u[p] * (1 - logistic.cdf(-1 * (np.dot(u[p], v[j]) + np.dot(u[p], v[g]))))
+                            v[g] = v[g] - self.gamma * u[p] * (
+                                1 - logistic.cdf(
+                                    (-1) * (np.dot(u[p], v[j]) + np.dot(u[p], v[g])))) - 2 * self.lamda * np.sqrt(
+                                np.dot(v[g], v[g]))
 
-                        u[p] = u[p] + self.gamma * (jpi_up + gpj_up)
-                        jpi_vi = u[p] * (1 - logistic.cdf(np.dot(u[p], v[i]) - np.dot(u[p], v[j])))
-                        v[i] = v[i] + self.gamma * jpi_vi
+                        # update up
+                        gradient_Dr_up = jpi_up - gpj_up
+                        u[p] = u[p] + self.gamma * gradient_Dr_up - 2 * self.lamda * np.sqrt(
+                            np.dot(u[p], u[p]))
+                        # update vi
+                        gradient_Dr_vi = u[p] * (1 - logistic.cdf(np.dot(u[p], v[i]) - np.dot(u[p], v[j])))
+                        v[i] = v[i] + self.gamma * gradient_Dr_vi - 2 * self.lamda * np.sqrt(np.dot(v[i], v[i]))
                         # 2017.11.12 16:00
                         # update negtive item vg and vj, this is neccessary
-                        v[j] = v[j] + self.gamma * (jpi_vj + gpj_vj)
+                        # update vj
+                        gradient_Dr_vj = jpi_vj - gpj_vj
+                        v[j] = v[j] + self.gamma * gradient_Dr_vj - 2 * self.lamda * np.sqrt(np.dot(v[j], v[j]))
 
                         # as to Cvi
                         parameter = self.alpha3 / float(non_zero_size_category_vi)
@@ -222,7 +247,7 @@ class MRLR():
                 continue
             for id_one in range(non_zero_size_item_up - 1):
                 i = non_zero_item_up[0][id_one]
-                for id_two in range(i + 1, non_zero_size_item_up):
+                for id_two in range(id_one + 1, non_zero_size_item_up):
                     k = non_zero_item_up[0][id_two]
                     # P(vk|up,vi,sita)
                     # P(vi|up,vk,sita)
@@ -235,22 +260,15 @@ class MRLR():
                     pvk_negtive = 1
                     pvi_negtive = 1
                     for index_three in range(self.N):
-                    # for index_three in range(4):
+                        # for index_three in range(4):
                         id_three = negtive_sample[index_three]
                         g = is_zero_item_up[0][id_three]
-                        a = (-1) * (self.alpha1 * np.dot(u[p], v[g]) + self.alpha2 * np.dot(v[k], v[g]))
-                        # print(a)
-
-
                         pvk_negtive = pvk_negtive * logistic.cdf(
                             (-1) * (self.alpha1 * np.dot(u[p], v[g]) + self.alpha2 * np.dot(v[i], v[g])))
 
-
                         pvi_negtive = pvi_negtive * logistic.cdf(
                             (-1) * (self.alpha1 * np.dot(u[p], v[g]) + self.alpha2 * np.dot(v[k], v[g])))
-                        # print(pvk_negtive)
-                    # print('pvk_negtive:%f' % pvk_negtive)
-                    # print('pvi_negtive:%f' % pvi_negtive)
+
                     pvk = pvk_positive * pvk_negtive
                     pvi = pvi_positive * pvi_negtive
                     # print(pvk)
@@ -259,7 +277,7 @@ class MRLR():
                     # very important!!!
                     if result != 0:
                         pDc += np.log(result)
-                    # print(pDc)
+                        # print(pDc)
 
                 number_Dr = non_zero_size_item_up
                 sample_result = random.sample(range(is_zero_size_item_up), number_Dr)
@@ -272,20 +290,20 @@ class MRLR():
                     pij_negtive = 1
                     negtive_sample = random.sample(range(is_zero_size_item_up), self.N)
                     for index_three in range(self.N):
-                    # for index_three in range(4):
+                        # for index_three in range(4):
                         id_five = negtive_sample[index_three]
                         g = is_zero_item_up[0][id_five]
-                        b = np.dot(u[p], v[j]) - np.dot(u[p], v[g])
-                        # print('b:%f' %b)
-                        x = logistic.cdf(-1 * (np.dot(u[p], v[j]) + np.dot(u[p], v[g])))
                         pij_negtive = pij_negtive * logistic.cdf(-1 * (np.dot(u[p], v[j]) + np.dot(u[p], v[g])))
-                    # print('pij_negtive:%f' %pij_negtive)
                     result = pij_postive * pij_negtive
                     if result != 0:
                         pDr += np.log(result)
         J = (pDc + pDr) * (-1)
+        print(J)
+        reg = 0
         for user_id in range(len(u)):
-            J += self.lamda * np.dot(u[user_id], u[user_id])
+            reg += np.dot(u[user_id], u[user_id])
         for item_id in range(len(v)):
-            J += self.lamda * np.dot(v[item_id], v[item_id])
+            reg += np.dot(v[item_id], v[item_id])
+
+        J += self.lamda * np.sqrt(reg)
         return J

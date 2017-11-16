@@ -25,7 +25,8 @@ if __name__ == '__main__':
     # 测试
     loaddata = MRLR_LoadData.loadData()
     R, C, user_dict, asin_id, category_dict = loaddata.creat_R_C()
-    opt_MRLR = MRLR_Optimization_backup.MRLR(R,C,0.001,0.1,0.8,0.01,10,50,5)
+    # R, C, lamda, alpha1, alpha3, gamma, d, iter, N
+    opt_MRLR = MRLR_Optimization_backup.MRLR(R,C,0.001,0.8,0.3,0.01,10,50,5)
     u,v,c = opt_MRLR.updata_parameter()
 
     # print(u)
