@@ -115,10 +115,6 @@ class MRLR():
                             g = is_zero_item_up[0][id_three]
                             gpi_up = gpi_up + v[g] * (1 - logistic.cdf(
                                 (-1) * (self.alpha1 * np.dot(u[p], v[g]) + self.alpha2 * np.dot(v[k], v[g]))))
-                            # # 2017.11.12 16:00
-                            # # update negtive item vg, this is neccessary
-                            # v[g] = v[g] - self.gamma * (u[p] + v[k]) * (1 - logistic.cdf(
-                            #     (-1) * (self.alpha1 * np.dot(u[p], v[g]) + self.alpha2 * np.dot(v[k], v[g]))))
 
                             gpk_up = gpk_up + v[g] * (1 - logistic.cdf(
                                 (-1) * (self.alpha1 * np.dot(u[p], v[g]) + self.alpha2 * np.dot(v[i], v[g]))))
