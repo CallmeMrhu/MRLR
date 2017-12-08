@@ -121,13 +121,17 @@ class MRLR():
 
                             # 2017.11.12 16:00
                             # update negtive item vg, this is neccessary
+                            # v[g] = v[g] - self.gamma * (u[p] + v[i]) * (1 - logistic.cdf(
+                            #     (-1) * (self.alpha1 * np.dot(u[p], v[g]) + self.alpha2 * np.dot(v[i], v[
+                            #         g])))) - 2 * self.lamda * np.sqrt(np.dot(v[g], v[g]))
                             v[g] = v[g] - self.gamma * (u[p] + v[i]) * (1 - logistic.cdf(
                                 (-1) * (self.alpha1 * np.dot(u[p], v[g]) + self.alpha2 * np.dot(v[i], v[
-                                    g])))) - 2 * self.lamda * np.sqrt(np.dot(v[g], v[g]))
+                                    g])))) - 2 * self.lamda * v[g]
                         # update up
                         gradient_Dc_up = kpi_up + ipk_up - gpi_up - gpk_up
-                        u[p] = u[p] + self.gamma * gradient_Dc_up - 2 * self.lamda * np.sqrt(
-                            np.dot(u[p], u[p]))
+                        # u[p] = u[p] + self.gamma * gradient_Dc_up - 2 * self.lamda * np.sqrt(
+                        #     np.dot(u[p], u[p]))
+                        u[p] = u[p] + self.gamma * gradient_Dc_up - 2 * self.lamda * u[p]
                         # update vi
                         kpi_vi = kpi_up
                         ipk_vi = (u[p] + v[k]) * (
@@ -135,8 +139,9 @@ class MRLR():
                         gpi_vi = 0
                         gpk_vi = gpk_up
                         gradient_Dc_vi = kpi_vi + ipk_vi - gpi_vi - gpk_vi
-                        v[i] = v[i] + self.gamma * gradient_Dc_vi - 2 * self.lamda * np.sqrt(
-                            np.dot(v[i], v[i]))
+                        # v[i] = v[i] + self.gamma * gradient_Dc_vi - 2 * self.lamda * np.sqrt(
+                        #     np.dot(v[i], v[i]))
+                        v[i] = v[i] + self.gamma * gradient_Dc_vi - 2 * self.lamda * v[i]
                         # update vk
                         ipk_vk = ipk_up
                         kpi_vk = (u[p] + v[i]) * (
@@ -144,8 +149,9 @@ class MRLR():
                         gpk_vk = 0
                         gpi_vk = gpi_up
                         gradient_Dc_vk = ipk_vk + kpi_vk - gpk_vk - gpi_vk
-                        v[k] = v[k] + self.gamma * gradient_Dc_vk - 2 * self.lamda * np.sqrt(
-                            np.dot(v[k], v[k]))
+                        # v[k] = v[k] + self.gamma * gradient_Dc_vk - 2 * self.lamda * np.sqrt(
+                        #     np.dot(v[k], v[k]))
+                        v[k] = v[k] + self.gamma * gradient_Dc_vk - 2 * self.lamda * v[k]
 
                         # update cl : category,including Cvi & Cvk
                         # as to Cvi
@@ -196,23 +202,29 @@ class MRLR():
                             # 2017.11.12 16:00
                             # update negtive item vg and vj, this is neccessary
                             gpj_vj = gpj_vj + u[p] * (1 - logistic.cdf((-1) * (np.dot(u[p], v[j]) + np.dot(u[p], v[g]))))
+                            # v[g] = v[g] - self.gamma * u[p] * (
+                            #     1 - logistic.cdf(
+                            #         (-1) * (np.dot(u[p], v[j]) + np.dot(u[p], v[g])))) - 2 * self.lamda * np.sqrt(
+                            #     np.dot(v[g], v[g]))
                             v[g] = v[g] - self.gamma * u[p] * (
                                 1 - logistic.cdf(
-                                    (-1) * (np.dot(u[p], v[j]) + np.dot(u[p], v[g])))) - 2 * self.lamda * np.sqrt(
-                                np.dot(v[g], v[g]))
+                                    (-1) * (np.dot(u[p], v[j]) + np.dot(u[p], v[g])))) - 2 * self.lamda * v[g]
 
                         # update up
                         gradient_Dr_up = jpi_up - gpj_up
-                        u[p] = u[p] + self.gamma * gradient_Dr_up - 2 * self.lamda * np.sqrt(
-                            np.dot(u[p], u[p]))
+                        # u[p] = u[p] + self.gamma * gradient_Dr_up - 2 * self.lamda * np.sqrt(
+                        #     np.dot(u[p], u[p]))
+                        u[p] = u[p] + self.gamma * gradient_Dr_up - 2 * self.lamda * u[p]
                         # update vi
                         gradient_Dr_vi = u[p] * (1 - logistic.cdf(np.dot(u[p], v[i]) - np.dot(u[p], v[j])))
-                        v[i] = v[i] + self.gamma * gradient_Dr_vi - 2 * self.lamda * np.sqrt(np.dot(v[i], v[i]))
+                        # v[i] = v[i] + self.gamma * gradient_Dr_vi - 2 * self.lamda * np.sqrt(np.dot(v[i], v[i]))
+                        v[i] = v[i] + self.gamma * gradient_Dr_vi - 2 * self.lamda * v[i]
                         # 2017.11.12 16:00
                         # update negtive item vg and vj, this is neccessary
                         # update vj
                         gradient_Dr_vj = jpi_vj - gpj_vj
-                        v[j] = v[j] + self.gamma * gradient_Dr_vj - 2 * self.lamda * np.sqrt(np.dot(v[j], v[j]))
+                        # v[j] = v[j] + self.gamma * gradient_Dr_vj - 2 * self.lamda * np.sqrt(np.dot(v[j], v[j]))
+                        v[j] = v[j] + self.gamma * gradient_Dr_vj - 2 * self.lamda * v[j]
 
                         # as to Cvi
                         # parameter = self.alpha3 / float(non_zero_size_category_vi)
@@ -272,8 +284,8 @@ class MRLR():
                     # very important!!!
                     if result != 0:
                         pDc += np.log(result)
-                    else:
-                        print("there is an error_one,pvk:%f , pvi:%f " % (pvk,pvi))
+                    # else:
+                    #     print("there is an error_one,pvk:%f , pvi:%f " % (pvk,pvi))
                         # print(pDc)
 
             for id_one in range(non_zero_size_item_up):
@@ -297,8 +309,8 @@ class MRLR():
                     result = pij_postive * pij_negtive
                     if result != 0:
                         pDr += np.log(result)
-                    else:
-                        print("there is an error_two,pij_postive:%f , pij_negtive:%f " % (pij_postive,pij_negtive))
+                    # else:
+                    #     print("there is an error_two,pij_postive:%f , pij_negtive:%f " % (pij_postive,pij_negtive))
 
         J = (pDc + pDr) * (-1)
         print('--------------------------------pDc+pDr = %f' % J)
