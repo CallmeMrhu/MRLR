@@ -22,15 +22,10 @@ if __name__ == '__main__':
 
     # R,C,lamda,alpha1,alpha3,gamma,d,iter,N,Count):
 
-    # 测试
+    # test
     loaddata = MRLR_LoadData.loadData()
     R, C, user_dict, asin_id, category_dict = loaddata.creat_R_C()
     # R, C, lamda, alpha1, alpha3, gamma, d, iter, N
-    opt_MRLR = MRLR_Optimization_run.MRLR(R, C, 0.001, 0.8, 0.3, 0.001, 10, 50, 10)
+    opt_MRLR = MRLR_Optimization_run.MRLR(R, C, 0.01, 0.8, 0.3, 0.01, 10, 50, 10)
     u,v,v_ctx,c = opt_MRLR.updata_parameter()
 
-    # print(u)
-    # print(v)
-
-    # print(Dr)
-    # print(Dr.shape)
